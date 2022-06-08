@@ -2,44 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//ÈôÊ¹ÓÃ¸Ã½Å±¾ ±ØĞëÔÚ½áÊøplayÇ°Ë¢ĞÂÒ»´Î»Ö¸´µØĞÎÊı¾İ ·ñÔòÒÑ¾­²ÉÕª£¨É¾³ı£©µÄÖ²±»½«ÓÀ¾Ã¶ªÊ§
+//è‹¥ä½¿ç”¨è¯¥è„šæœ¬ å¿…é¡»åœ¨ç»“æŸplayå‰åˆ·æ–°ä¸€æ¬¡æ¢å¤åœ°å½¢æ•°æ® å¦åˆ™å·²ç»é‡‡æ‘˜ï¼ˆåˆ é™¤ï¼‰çš„æ¤è¢«å°†æ°¸ä¹…ä¸¢å¤±
 public class Tree2Prefabs : MonoBehaviour
 {
     [SerializeField]
-    [Header("ÊÇ·ñÔÚÉ¾³ıºóÉú³ÉÔ¤ÖÆÌå")]
-    [Tooltip("Ä¿Ç°Ã»ÓĞÇåÀíÉú³ÉµÄÔ¤ÖÆÌåµÄÂß¼­")]
+    [Header("æ˜¯å¦åœ¨åˆ é™¤åç”Ÿæˆé¢„åˆ¶ä½“")]
+    [Tooltip("ç›®å‰æ²¡æœ‰æ¸…ç†ç”Ÿæˆçš„é¢„åˆ¶ä½“çš„é€»è¾‘")]
     bool isGenerate;
     [SerializeField]
-    [Header("È«¾ÖË¢ĞÂÊ±¼ä¼ä¸ô")]
+    [Header("å…¨å±€åˆ·æ–°æ—¶é—´é—´éš”")]
     private float refreshGap;
     private float timer;
     [SerializeField]
-    [Header("Ê°È¡·¶Î§")]
+    [Header("æ‹¾å–èŒƒå›´")]
     private float pickRange;
-    //ÄÚ½¨ÊµÀı±í
+    //å†…å»ºå®ä¾‹è¡¨
     private List<TreeInstance> TreeInstances;
-    //´æ´¢ÒªÉ¾³ıµÄindex
+    //å­˜å‚¨è¦åˆ é™¤çš„index
     private List<int> deleteList;
 
-    //Ô­Ê¼µØĞÎĞÅÏ¢
+    //åŸå§‹åœ°å½¢ä¿¡æ¯
     private Terrain oTerrain;
     private TerrainData oData;
     private List<TreeInstance> oInstances;
 
-    //Íæ¼ÒÒıÓÃ
+    //ç©å®¶å¼•ç”¨
     private GameObject player;
 
     void Start()
     {
-        //×Ô½¨ÄÚÈİ ÁĞ±íÖ§³Öremove
+        //è‡ªå»ºå†…å®¹ åˆ—è¡¨æ”¯æŒremove
         TreeInstances = new List<TreeInstance>(Terrain.activeTerrain.terrainData.treeInstances);
 
-        //Ô­Ê¼ĞÅÏ¢
+        //åŸå§‹ä¿¡æ¯
         oTerrain = Terrain.activeTerrain;
         oData = oTerrain.terrainData;
         oInstances = new List<TreeInstance>(Terrain.activeTerrain.terrainData.treeInstances);
 
-        //Íæ¼Ò
+        //ç©å®¶
         player = GameObject.FindGameObjectWithTag("Player");
     }
 
@@ -48,44 +48,46 @@ public class Tree2Prefabs : MonoBehaviour
         timer += Time.deltaTime;
         if (timer > refreshGap)
         {
-            Debug.Log("Ë¢ĞÂ");
+            Debug.Log("åˆ·æ–°");
+            //æ¢å¤æ•°æ®
             RecoverData();
             timer = 0;
         }
 
         if(Input.GetKeyUp(KeyCode.Space))
         {
+            //å–æœ€è¿‘èµ„æºå˜ä¸ºé¢„åˆ¶ä½“
             Generate();
         }
     }
 
     void Generate()
     {
-        //ÏÖÔÚËù´¦µÄÎ»ÖÃ
+        //ç°åœ¨æ‰€å¤„çš„ä½ç½®
         float sampleHeight = Terrain.activeTerrain.SampleHeight(player.transform.position);
-        //Íæ¼ÒÎ»ÖÃÔÚµØ±íÒÔÏÂµÄÇé¿ö ±£»¤´ëÊ©
+        //ç©å®¶ä½ç½®åœ¨åœ°è¡¨ä»¥ä¸‹çš„æƒ…å†µ ä¿æŠ¤æªæ–½
         if (player.transform.position.y < sampleHeight + 0.01f) return;
 
-        //Ìæ»»ÄÚÈİ
+        //æ›¿æ¢å†…å®¹
         TerrainData terrainData = Terrain.activeTerrain.terrainData;
         TreeInstance[] treeInstances = terrainData.treeInstances;
 
-        //»ñÈ¡ÀëÍæ¼Ò×î½üµÄ×ÊÔ´
+        //è·å–ç¦»ç©å®¶æœ€è¿‘çš„èµ„æº
         Vector3 closestTreePos = new Vector3();
         int closestTreeIndex = 0;
         int closestTreePrototypeIndex = 0;
         float maxDistance = float.MaxValue;
         for(int i = 0; i < treeInstances.Length; i++)
         {
-            //Èç¹û²»ÊÇ×ÊÔ´Ôò²»¿¼ÂÇ×ª»»
+            //å¦‚æœä¸æ˜¯èµ„æºåˆ™ä¸è€ƒè™‘è½¬æ¢
             var prototypeIndex = treeInstances[i].prototypeIndex;
             if (!oData.treePrototypes[prototypeIndex].prefab.CompareTag("Res")) continue;
 
-            //»ñÈ¡Ê÷Î»ÖÃ
+            //è·å–æ ‘ä½ç½®
             var treePosOS = treeInstances[i].position;
             var treePosWS = new Vector3(treePosOS.x * oData.size.x, treePosOS.y * oData.size.y, treePosOS.z * oData.size.z) + Terrain.activeTerrain.transform.position;
 
-            //±È½ÏÎ»ÖÃ
+            //æ¯”è¾ƒä½ç½®
             float distance = Vector3.Distance(player.transform.position, treePosWS);
             if(distance < maxDistance && distance < pickRange)
             {
@@ -104,52 +106,18 @@ public class Tree2Prefabs : MonoBehaviour
 
         if(isGenerate)
         {
-            //¶ÔÓ¦Î»ÖÃÉú³ÉÔ¤ÖÆÌå
+            //å¯¹åº”ä½ç½®ç”Ÿæˆé¢„åˆ¶ä½“
             GameObject obj = Instantiate(oData.treePrototypes[closestTreePrototypeIndex].prefab);
             obj.transform.position = closestTreePos;
             obj.transform.parent = gameObject.transform;
-            obj.name = "Éú³ÉµÄ×î½üÔ¤ÖÆÌå" + closestTreeIndex;
+            obj.name = "ç”Ÿæˆçš„æœ€è¿‘é¢„åˆ¶ä½“" + closestTreeIndex;
 
         }
 
-        Debug.Log("¼ñÁËÒ»¸ö" + oData.treePrototypes[closestTreePrototypeIndex].prefab.name);
+        Debug.Log("æ¡äº†ä¸€ä¸ª" + oData.treePrototypes[closestTreePrototypeIndex].prefab.name);
     }
-
-
-    //½«×ÊÔ´Ô¤ÖÆÌå·Åµ½³¡¾°ÖĞ
-    private void setPrefabs()
-    {
-        //ÈİÆ÷
-        GameObject parent = new GameObject();
-        parent.transform.parent = gameObject.transform;
-        parent.name = "Éú³ÉµÄÔ¤ÖÆÌå";
-
-        //±éÀúµØĞÎµÃµ½ÒªÉ¾³ıµÄ¶ÔÏó
-        for (int index = 0; index < oData.treeInstances.Length; index++)
-        {
-            //Ô¤ÖÆÌåindex
-            var treePrototypeIndex = oData.GetTreeInstance(index).prototypeIndex;
-            //Èç¹û²»ÊÇ¿É½»»¥µÄÀàĞÍ ÌøÖÁÏÂÒ»¸ö
-            if (oData.treePrototypes[treePrototypeIndex].prefab.CompareTag("Res"))
-            {
-                //»ñµÃÒªĞÂ½¨µÄÔ¤ÖÆÌåµÄÎ»ÖÃ
-                var treePosOS = oData.GetTreeInstance(index).position;
-                var treePosWS = new Vector3(treePosOS.x * oData.size.x, treePosOS.y * oData.size.y, treePosOS.z * oData.size.z) + Terrain.activeTerrain.transform.position;
-                //µØĞÎ·½Ïò
-                var terrainNormal = oData.GetInterpolatedNormal(treePosWS.x, treePosWS.y);
-
-                //ÊµÀı»¯
-                GameObject obj = GameObject.Instantiate(oData.treePrototypes[treePrototypeIndex].prefab, treePosWS, Quaternion.Euler(terrainNormal * (30 * Random.Range(0, 11) % 360)));
-                //ÉèÖÃ¸¸ÎïÌå
-                obj.transform.parent = parent.transform;
-                //Ëõ·Å
-                obj.transform.localScale *= Random.Range(0.7f, 1.3f);
-
-                //¼ÇÂ¼ÒªÉ¾³ıµÄindex
-                deleteList.Add(index);
-            }
-        }
-    }
+    
+    //å°†ç°æœ‰åœ°å½¢çš„æ•°æ®å›å¤ä¸ºåŸå§‹æ•°æ® éœ€è¦æ¢å¤æ—¶è°ƒç”¨
     private void RecoverData()
     {
         Terrain.activeTerrain.terrainData = oData;
